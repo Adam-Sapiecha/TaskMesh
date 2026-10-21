@@ -3,3 +3,6 @@
 bin
 backups
 artifacts
+web/node_modules
+web/dist
+source*.tar.gz

@@ -156,6 +156,19 @@ func (r Submit) Validate() error {
 }
 func UUID(text string) (pgtype.UUID, error) { var id pgtype.UUID; err := id.Scan(text); return id, err }
 func (s *Store) Submit(ctx context.Context, r Submit, key string) (json.RawMessage, bool, error) {
+	return s.submit(ctx, r, key, "")
+}
+func (s *Store) SubmitPublic(ctx context.Context, r Submit, key, scope string) (json.RawMessage, bool, error) {
+	if scope == "" {
+		return nil, false, ErrSession
+	}
+	if key != "" {
+		sum := sha256.Sum256([]byte(scope + ":" + key))
+		key = "public:" + hex.EncodeToString(sum[:])
+	}
+	return s.submit(ctx, r, key, scope)
+}
+func (s *Store) submit(ctx context.Context, r Submit, key, scope string) (json.RawMessage, bool, error) {
 	// Marshal through interface{} normalizes nested object key order and number representation.
 	b, err := json.Marshal(r)
 	if err != nil {
@@ -176,6 +189,11 @@ func (s *Store) Submit(ctx context.Context, r Submit, key string) (json.RawMessa
 		return nil, false, err
 	}
 	defer tx.Rollback(ctx)
+	if scope != "" {
+		if err = s.lockPublicAdmission(ctx, tx, scope); err != nil {
+			return nil, false, err
+		}
+	}
 	if key != "" {
 		// Serialize only submissions sharing the key; collision only causes harmless contention.
 		if _, err = tx.Exec(ctx, "SELECT pg_advisory_xact_lock(hashtextextended($1,0))", key); err != nil {
@@ -190,6 +208,11 @@ func (s *Store) Submit(ctx context.Context, r Submit, key string) (json.RawMessa
 			return json.RawMessage(existing), true, tx.Commit(ctx)
 		}
 		if !errors.Is(err, pgx.ErrNoRows) {
+			return nil, false, err
+		}
+	}
+	if scope != "" {
+		if err = s.publicQuota(ctx, tx, scope); err != nil {
 			return nil, false, err
 		}
 	}
@@ -212,12 +235,20 @@ func (s *Store) Submit(ctx context.Context, r Submit, key string) (json.RawMessa
 	}
 	var result string
 	var id pgtype.UUID
-	err = tx.QueryRow(ctx, `INSERT INTO jobs(type,queue,payload,priority,run_at,max_attempts,timeout_seconds) VALUES($1,$2,$3,$4,COALESCE($5,clock_timestamp()),$6,$7) RETURNING id,to_jsonb(jobs)::text`, r.Type, r.Queue, r.Payload, *r.Priority, r.RunAt, r.MaxAttempts, r.TimeoutSeconds).Scan(&id, &result)
+	err = tx.QueryRow(ctx, `INSERT INTO jobs(type,queue,payload,priority,run_at,max_attempts,timeout_seconds,public_session_hash) VALUES($1,$2,$3,$4,COALESCE($5,clock_timestamp()),$6,$7,NULLIF($8,'')) RETURNING id,to_jsonb(jobs)::text`, r.Type, r.Queue, r.Payload, *r.Priority, r.RunAt, r.MaxAttempts, r.TimeoutSeconds, scope).Scan(&id, &result)
 	if err != nil {
 		return nil, false, err
 	}
 	if key != "" {
 		if _, err = tx.Exec(ctx, "INSERT INTO idempotency_keys(key,request_hash,job_id) VALUES($1,$2,$3)", key, hash, id); err != nil {
+			return nil, false, err
+		}
+	}
+	if scope != "" {
+		if _, err = tx.Exec(ctx, "UPDATE public_sessions SET submitted=submitted+1 WHERE token_hash=$1", scope); err != nil {
+			return nil, false, err
+		}
+		if _, err = tx.Exec(ctx, "UPDATE public_budget SET jobs=jobs+1 WHERE id=1"); err != nil {
 			return nil, false, err
 		}
 	}

@@ -34,7 +34,7 @@ func env(key, fallback string) string {
 }
 func run() error {
 	if len(os.Args) != 2 {
-		return errors.New("usage: taskmesh api|worker|controller|migrate|probe")
+		return errors.New("usage: taskmesh api|public|worker|controller|migrate|probe")
 	}
 	mode := os.Args[1]
 	if mode == "probe" {
@@ -49,7 +49,7 @@ func run() error {
 		}
 		return nil
 	}
-	if mode != "api" && mode != "worker" && mode != "controller" && mode != "migrate" {
+	if mode != "api" && mode != "public" && mode != "worker" && mode != "controller" && mode != "migrate" {
 		return errors.New("unknown process mode")
 	}
 	if os.Getenv("DATABASE_URL") == "" {
@@ -89,6 +89,11 @@ func run() error {
 				return errors.New("runtime role grants failed")
 			}
 		}
+		if os.Getenv("TASKMESH_GRANT_PUBLIC_ROLE") == "1" {
+			if err = s.GrantPublicRuntime(call, "taskmesh_app"); err != nil {
+				return errors.New("public runtime grants failed")
+			}
+		}
 		slog.Info("migrations applied")
 		return nil
 	}
@@ -101,6 +106,30 @@ func run() error {
 			return errors.New("TASKMESH_API_KEY must contain at least 32 bytes")
 		}
 		handler = api.Server{Store: s, Registry: handlers.Builtins(), Token: token}.Handler()
+	}
+	if mode == "public" {
+		origin := os.Getenv("PUBLIC_ORIGIN")
+		if origin == "" {
+			return errors.New("PUBLIC_ORIGIN is required for public mode")
+		}
+		handler = api.PublicServer{Store: s, Registry: handlers.Builtins(), Origin: origin, BasePath: strings.TrimRight(os.Getenv("PUBLIC_BASE_PATH"), "/"), WebDir: env("WEB_DIR", "web/dist"), SecureCookie: strings.HasPrefix(origin, "https://")}.Handler()
+		go func() {
+			ticker := time.NewTicker(time.Minute)
+			defer ticker.Stop()
+			for {
+				select {
+				case <-ctx.Done():
+					return
+				case <-ticker.C:
+					call, cancel := context.WithTimeout(ctx, 4*time.Second)
+					err := s.CleanupPublic(call)
+					cancel()
+					if err != nil {
+						slog.Warn("visitor retention cleanup unavailable")
+					}
+				}
+			}
+		}()
 	}
 	server := http.Server{Addr: ":" + env("PORT", "8080"), Handler: handler, ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 10 * time.Second, WriteTimeout: 10 * time.Second, IdleTimeout: 30 * time.Second, MaxHeaderBytes: 16384}
 	httpErrors := make(chan error, 1)
@@ -157,7 +186,7 @@ func run() error {
 	shutdown, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	_ = server.Shutdown(shutdown)
-	if mode != "api" && !processFinished {
+	if mode != "api" && mode != "public" && !processFinished {
 		select {
 		case err = <-finished:
 			if result == nil {

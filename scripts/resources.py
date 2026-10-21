@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Read per-process PSS when Docker's memory cgroup accounting is unavailable."""
 import json
+import argparse
 import pathlib
 import subprocess
 
@@ -10,8 +11,11 @@ def docker(*args):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--project', default='taskmesh')
+    args = parser.parse_args()
     rows = []
-    for container in docker('ps', '-q', '--filter', 'label=com.docker.compose.project=taskmesh').splitlines():
+    for container in docker('ps', '-q', '--filter', 'label=com.docker.compose.project=' + args.project).splitlines():
         name = docker('inspect', '--format', '{{.Name}}', container).lstrip('/')
         processes = docker('top', container, '-eo', 'pid').splitlines()[1:]
         pss_kib = 0

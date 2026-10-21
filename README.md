@@ -1,13 +1,15 @@
 # TaskMesh
 
 Durable, pull-based background jobs in Go and PostgreSQL. This repository implements
-the **Phase 1 core engine**, with lease fencing, renewal, retries and crash recovery
+the durable core engine and a **public React execution console**, with lease fencing, renewal, retries and crash recovery
 included so that independent workers can safely restart. It is a real execution
 engine with persisted inputs, results and audit history.
 
-Deployed privately on luxonis: [HTTPS readiness](https://luxonis.tail6ad453.ts.net:10000/readyz)
-(Tailscale required). This is an authenticated API; the React dashboard is not yet
-implemented. See [server deployment details](docs/deployment-luxonis.md).
+[Try TaskMesh in your browser](https://luxonis.tail6ad453.ts.net:8443/taskmesh/) —
+no account or Tailscale required. The visitor console runs against its own
+PostgreSQL instance, isolated from the owner's authenticated API.
+See [public deployment](docs/public-deployment.md) and
+[private server deployment](docs/deployment-luxonis.md).
 
 ## Run with Docker Compose
 
@@ -69,11 +71,39 @@ All `/api/` endpoints require the instance's bearer token; health checks are pub
 | GET | `/api/v1/workers` | Latest 100 worker sessions and heartbeats |
 | GET | `/healthz`, `/readyz` | Liveness / PostgreSQL and migration readiness |
 
-This is a **single trusted project per stack**, not a multi-user or anonymous demo.
+The private REST API is a **single trusted project per stack**.
 Anyone with its token can access all jobs. Use independent stacks and credentials
-for independent owners. Browser dashboards, anonymous sessions, RBAC, gRPC, SSE,
-cron, OpenTelemetry and Failure Lab are later roadmap items, not completed features.
-No frontend is required for the Phase 1 API; no dashboard container is claimed.
+for independent owners. The public console instead uses HttpOnly visitor-session
+cookies and only returns the visitor's own jobs. RBAC, gRPC, SSE, cron,
+OpenTelemetry and Failure Lab remain roadmap items. The console uses 2.5-second
+polling; it does not claim SSE transport or production fault-injection controls.
+
+## Public visitor console
+
+`compose.public.yaml` creates a separate `taskmesh-public` stack with its own DB,
+network, volume and credentials. It runs `taskmesh public` rather than the owner API.
+Copy `.env.public.example` to a **separate** `.env` file in your public deployment
+directory, fill independent DB passwords and set the exact browser origin/path.
+Use `docker compose -f compose.public.yaml up --build -d --wait`.
+
+Each browser gets an HttpOnly, Secure (HTTPS), SameSite=Strict cookie. Session
+secrets are stored only as SHA-256 hashes in PostgreSQL. Sessions expire in 24 hours.
+Admission is transactional: 30 jobs/session, 200 jobs/fixed clock hour globally,
+60 new sessions/hour, and 5000 retained jobs/sessions. Inputs are <=8 KiB, computation
+is <=10000 SHA-256 rounds, timeout is 15 seconds, and arbitrary commands/network
+integrations are absent. A periodic janitor deletes terminal jobs belonging only
+to expired public sessions. No private NULL-scoped job can match retention cleanup.
+
+Frontend development uses Node 24:
+
+```sh
+npm ci --prefix web
+npm run build --prefix web
+# Or npm run dev --prefix web with a local public API on port 8085.
+```
+
+The Dockerfile builds the React/TypeScript assets and serves them from Go; no
+runtime Node process or administrator API key is shipped to the browser.
 
 ## Develop and test
 

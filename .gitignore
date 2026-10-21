@@ -1,6 +1,7 @@
 .env
 .env.*
 !.env.example
+!.env.public.example
 bin/
 coverage.out
 *.test
@@ -15,3 +16,6 @@ loadtest-results.json
 loadtest-http.log
 resource-measurement.json
 __pycache__/
+web/node_modules/
+web/dist/
+node_modules/
