@@ -1,0 +1,15 @@
+name: taskmesh-tests
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: taskmesh_test
+      POSTGRES_USER: taskmesh_test
+      POSTGRES_PASSWORD: taskmesh_test_local_only
+    ports: ["127.0.0.1:55432:5432"]
+    tmpfs: ["/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskmesh_test -d taskmesh_test"]
+      interval: 2s
+      timeout: 2s
+      retries: 20

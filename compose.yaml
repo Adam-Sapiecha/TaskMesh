@@ -1,0 +1,116 @@
+name: taskmesh
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "5m"
+    max-file: "3"
+
+x-runtime: &runtime
+  image: taskmesh:${TASKMESH_VERSION:-local}
+  build: .
+  restart: unless-stopped
+  init: true
+  read_only: true
+  tmpfs: ["/tmp:size=8m,mode=1777"]
+  security_opt: ["no-new-privileges:true"]
+  cap_drop: ["ALL"]
+  networks: [taskmesh]
+  environment: &environment
+    DATABASE_URL: postgres://taskmesh_app:${TASKMESH_DB_PASSWORD:?Set TASKMESH_DB_PASSWORD in .env}@postgres:5432/taskmesh?sslmode=disable
+    GOMEMLIMIT: 96MiB
+    GOMAXPROCS: "1"
+  depends_on:
+    migrate:
+      condition: service_completed_successfully
+  mem_limit: 160m
+  cpus: 0.5
+  pids_limit: 64
+  stop_grace_period: 40s
+  healthcheck:
+    test: ["CMD", "taskmesh", "probe"]
+    interval: 15s
+    timeout: 4s
+    retries: 3
+    start_period: 15s
+  logging: *logging
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: taskmesh
+      POSTGRES_USER: taskmesh
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      TASKMESH_DB_PASSWORD: ${TASKMESH_DB_PASSWORD:?Set TASKMESH_DB_PASSWORD in .env}
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    command: ["postgres", "-c", "shared_buffers=64MB", "-c", "max_connections=40", "-c", "log_statement=none"]
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./deployments/init-runtime-role.sh:/docker-entrypoint-initdb.d/10-taskmesh-runtime.sh:ro
+    networks: [taskmesh]
+    mem_limit: 384m
+    cpus: 1
+    pids_limit: 96
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskmesh -d taskmesh"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    logging: *logging
+  migrate:
+    <<: *runtime
+    command: ["migrate"]
+    environment:
+      <<: *environment
+      DATABASE_URL: postgres://taskmesh:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@postgres:5432/taskmesh?sslmode=disable
+      TASKMESH_GRANT_RUNTIME_ROLE: "1"
+    restart: "no"
+    healthcheck:
+      disable: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+  api:
+    <<: *runtime
+    command: ["api"]
+    networks:
+      taskmesh: {}
+      ingress:
+        gw_priority: 1
+    environment:
+      <<: *environment
+      TASKMESH_API_KEY: ${TASKMESH_API_KEY:?Set TASKMESH_API_KEY in .env}
+    ports: ["127.0.0.1:${TASKMESH_HTTP_PORT:-8084}:8080"]
+  worker-1:
+    <<: *runtime
+    command: ["worker"]
+    environment:
+      <<: *environment
+      WORKER_NAME: worker-1
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-2}
+  worker-2:
+    <<: *runtime
+    command: ["worker"]
+    environment:
+      <<: *environment
+      WORKER_NAME: worker-2
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-2}
+  worker-3:
+    <<: *runtime
+    command: ["worker"]
+    environment:
+      <<: *environment
+      WORKER_NAME: worker-3
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-2}
+  controller:
+    <<: *runtime
+    command: ["controller"]
+
+networks:
+  taskmesh:
+    internal: true
+  ingress: {}
+volumes:
+  postgres-data:

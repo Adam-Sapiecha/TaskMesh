@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+bin/
+coverage.out
+*.test
+*.exe
+backups/
+artifacts/
+*.dump
+*.pem
+*.key
+smoke-results.json
+loadtest-results.json
+loadtest-http.log
+resource-measurement.json
+__pycache__/

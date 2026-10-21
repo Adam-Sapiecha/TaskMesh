@@ -1,0 +1,13 @@
+# TEMPLATE ONLY: merge into your chosen application proxy after read-only audit.
+# No existing private routes or administrative services should be changed.
+taskmesh.YOUR-DOMAIN.example {
+    encode zstd gzip
+    request_body {
+        max_size 64KB
+    }
+    reverse_proxy 127.0.0.1:8084
+    header Strict-Transport-Security "max-age=31536000"
+}
+# Assumes Caddy runs on the host. A Caddy container needs its own explicit
+# connection to TaskMesh's network and upstream api:8080 instead of loopback.
+# Do not publish PostgreSQL or worker health ports.

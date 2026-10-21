@@ -1,0 +1,10 @@
+version: "2"
+sql:
+  - engine: postgresql
+    schema: migrations/001_core.sql
+    queries: queries
+    gen:
+      go:
+        package: queries
+        out: ../internal/storage/queries
+        sql_package: pgx/v5
