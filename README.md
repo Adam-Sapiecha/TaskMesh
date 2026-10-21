@@ -1,6 +1,6 @@
 # TaskMesh
 
-Durable, pull-based background jobs in Go and PostgreSQL. This repository implements
+Durable, pull-based background jobs in Rust and PostgreSQL. This repository implements
 the durable core engine and a **public React execution console**, with lease fencing, renewal, retries and crash recovery
 included so that independent workers can safely restart. It is a real execution
 engine with persisted inputs, results and audit history.
@@ -8,8 +8,9 @@ engine with persisted inputs, results and audit history.
 [Try TaskMesh in your browser](https://luxonis.tail6ad453.ts.net:8443/taskmesh/) —
 no account or Tailscale required. The visitor console runs against its own
 PostgreSQL instance, isolated from the owner's authenticated API.
-See [public deployment](docs/public-deployment.md) and
-[private server deployment](docs/deployment-luxonis.md).
+See [current Rust deployment and verification](docs/rust-migration.md).
+Earlier [public](docs/public-deployment.md) and
+[private](docs/deployment-luxonis.md) deployment reports are retained as history.
 
 ## Run with Docker Compose
 
@@ -102,44 +103,40 @@ npm run build --prefix web
 # Or npm run dev --prefix web with a local public API on port 8085.
 ```
 
-The Dockerfile builds the React/TypeScript assets and serves them from Go; no
+The Dockerfile builds the React/TypeScript assets and serves them from Rust; no
 runtime Node process or administrator API key is shipped to the browser.
 
 ## Develop and test
 
-Go 1.26+, PostgreSQL 17. Generated sqlc read queries are checked in. Transactional
-claim, ACK and recovery SQL lives in `internal/storage/store.go` so transaction
-boundaries and lock ordering remain explicit.
+Rust 1.99.1 (pinned in `rust-toolchain.toml`), PostgreSQL 17 and Node 24 for the console.
+The backend uses Tokio, Axum and SQLx. Coordination statements live in
+`src/sql.rs`; transaction boundaries and public admission live in `src/storage.rs`.
 
 ```sh
-go mod download
-go test ./...                # unit tests; integration tests skip without the URL
+cargo test --locked --lib
 docker compose -f compose.test.yaml up -d --wait
 export TEST_DATABASE_URL='postgres://taskmesh_test:taskmesh_test_local_only@127.0.0.1:55432/taskmesh_test?sslmode=disable'
-go test -race -count=1 -timeout=180s ./...
-go test -tags=acceptance -count=1 -timeout=180s ./tests/integration
-go vet ./...
-go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0 generate -f db/sqlc.yaml
+cargo test --locked
+cargo fmt --check
+cargo clippy --locked --all-targets -- -D warnings
 docker compose -f compose.test.yaml down
 ```
 
 PowerShell: set `$env:TEST_DATABASE_URL='postgres://...'` instead of `export`.
-Tests create and remove uniquely named schemas in the supplied **test database**;
-never point this variable at production. CI requires the URL and never silently
-skips integration tests. The additional `acceptance` process test builds the executable, starts
-three actual workers plus an API, submits 1000 reports, checks results and restarts
-the API. More tests cover concurrent claims, queue/worker limits, transaction
-rollback, retries, cancellation, stale ACKs and concurrent idempotency requests.
+Integration tests require an explicit disposable test database; each test creates
+and removes a unique schema. Never point this URL at production. Tests include
+1000 reports through the HTTP API, three actual Rust worker processes and an API
+restart, plus fencing, recovery, quotas, retention and visitor HTTP isolation.
 
 Native operation:
 
 ```sh
-go build -o bin/taskmesh ./cmd/taskmesh
+cargo build --release --locked
 export DATABASE_URL='postgres://USER:PASSWORD@127.0.0.1:5432/taskmesh?sslmode=disable'
 export TASKMESH_API_KEY='YOUR_64_CHARACTER_RANDOM_HEX_KEY'
-bin/taskmesh migrate
-bin/taskmesh api
-# Other terminals with DATABASE_URL: bin/taskmesh worker, bin/taskmesh controller
+target/release/taskmesh migrate
+target/release/taskmesh api
+# Other terminals: target/release/taskmesh worker / controller
 ```
 
 Worker configuration: `WORKER_NAME`, `WORKER_QUEUES` (comma separated),
@@ -149,3 +146,10 @@ creates a unique session UUID, even when a worker name is reused.
 
 See [architecture](docs/architecture.md), [guarantees](docs/guarantees.md),
 [operations and recovery](docs/operations.md), and [verification](docs/verification.md).
+
+## Rust migration
+
+The running backend is Rust; React/TypeScript remains the browser interface.
+The previous Go implementation is preserved at Git tag `go-engine-v0.1`.
+Existing migration bytes, tables, public session cookies and HTTP paths are retained.
+See [Rust migration and verification](docs/rust-migration.md).

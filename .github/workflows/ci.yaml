@@ -20,11 +20,8 @@ jobs:
       TEST_DATABASE_URL: postgres://taskmesh_test:taskmesh_test_local_only@localhost:5432/taskmesh_test?sslmode=disable
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.26.x'
-          check-latest: true
-          cache: true
+      - name: Install pinned Rust toolchain
+        run: rustup show
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -32,18 +29,12 @@ jobs:
           cache-dependency-path: web/package-lock.json
       - name: Build visitor console
         run: npm ci --prefix web --no-audit --no-fund && npm run build --prefix web
-      - name: Format and vet
+      - name: Format and lint
         run: |
-          test -z "$(gofmt -l cmd internal db/embed.go tests)"
-          go vet ./...
-      - name: Reproduce generated queries
-        run: |
-          go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0 generate -f db/sqlc.yaml
-          git diff --exit-code -- internal/storage/queries
-      - name: Unit, integration and process acceptance tests with race detector
-        run: go test -race -tags=acceptance -count=1 -timeout=180s ./...
-      - name: Vulnerability analysis
-        run: go run golang.org/x/vuln/cmd/govulncheck@latest ./...
+          cargo fmt --check
+          cargo clippy --locked --all-targets -- -D warnings
+      - name: Unit, PostgreSQL integration and process acceptance tests
+        run: cargo test --locked
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
       - name: Build AMD64 and ARM64 images without publishing

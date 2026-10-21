@@ -12,7 +12,7 @@
 | Global limits | Queue-row and worker-row locking protect capacity checks |
 | Cancellation | Terminal state immediately; cooperative execution cancellation |
 | Persistence | Named PostgreSQL volume survives container replacement and normal restart |
-| Isolation | One trusted project per dedicated stack; no RBAC or shared anonymous access |
+| Isolation | Owner API: one trusted project per stack; public console: scoped visitor sessions in a separate stack |
 | Availability | One PostgreSQL instance; no DB HA, multi-region or automatic backup service |
 
 If PostgreSQL is unavailable, submissions fail with 503 and are never acknowledged
@@ -24,5 +24,5 @@ Priority starvation is possible under continuous high-priority load. Claims are
 bounded by polling latency, process capacity and contention. An accepted job whose
 handler has no compatible worker stays queued. Native worker code is trusted and
 has direct database access; use gRPC plus authorization before permitting remote
-untrusted workers. Idempotency keys have no TTL in this release; plan disk retention
-with explicit archival. Application tokens authorize all jobs in their instance.
+untrusted workers. Private idempotency keys have no TTL; plan disk retention with explicit archival.
+Public session data and keys are removed after expiry when jobs are terminal. Application tokens authorize all jobs in their instance.

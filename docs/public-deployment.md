@@ -1,3 +1,7 @@
+> Historical Go deployment report. The backend has since migrated to Rust; see
+> [current migration and verification](rust-migration.md). Results below describe
+> the earlier implementation and are retained as historical evidence.
+
 # Public TaskMesh — recruiter access, 2026-10-21
 
 The running application is available at

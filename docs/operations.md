@@ -1,6 +1,6 @@
 # Operation on luxonis
 
-The initial deployment is described in [the server report](deployment-luxonis.md).
+The current implementation is described in [the Rust report](rust-migration.md).
 The procedures below apply to subsequent deployments and maintenance.
 
 ## Preconditions and read-only audit
@@ -20,11 +20,10 @@ Never run global Docker cleanup. Do not touch `/usr/libexec/robothub`,
 
 ## ARM64 and resource budget
 
-The Go runtime is built with CGO disabled for the selected target architecture.
-Both the official Go/Alpine builder and PostgreSQL/Alpine publish ARM64 images.
-No GPU or native image-processing library is used. Before deployment verify the
-exact current manifests with `docker buildx imagetools inspect golang:1.26-alpine`,
-`alpine:3.23` and `postgres:17-alpine`; record resolved digests for a release.
+The Rust binary is built natively for the target platform with `rust:1.99.1-bookworm`.
+The final image uses Debian Bookworm slim and the frontend is built with Node 24.
+No GPU or native image-processing library is used. Verify target-platform image
+manifests before deployment and record resolved image digests for a release.
 
 Default stack: 3 workers x 2 slots, queue cap 8, 30-second leases, 5-second recovery
 scan, payload 64 KiB, maximum 10 attempts, timeout 300 seconds, queue backlog 10000.
@@ -32,30 +31,31 @@ Reports accept <=1000 finite numbers with absolute value <=1e12, text <=32768
 bytes, compute <=100000 hash rounds. No arbitrary code or URL fetching.
 
 Limits are budgets, not measurements: PostgreSQL 384 MiB; each of five long-running
-Go processes 160 MiB, GOMEMLIMIT 96 MiB, GOMAXPROCS 1; migration temporarily another
+Rust processes 160 MiB; migration temporarily another
 160 MiB. Nominal sum after migration: 1184 MiB. Cgroup overhead, filesystem cache,
-Docker and other services consume additional memory. CPU caps: DB 1 core, each Go
+Docker and other services consume additional memory. CPU caps: DB 1 core, each Rust
 process 0.5 core, so total caps can exceed physical availability during migration.
 This does not establish suitability for ten simultaneous applications on an 8 GB Pi.
 
 Measure main-flow RSS/CPU on the actual Pi using `docker stats` and disk growth
 before increasing concurrency. PostgreSQL data, results, events and deduplication
-keys grow without automatic retention. Monitor `df`, never fill the microSD, and
+keys in the private stack grow without automatic retention. Public expired-session
+terminal data is cleaned in bounded batches. Monitor `df`, never fill the microSD, and
 archive only intentionally selected historical data. No demo reset endpoint exists.
 
 ## HTTPS and access control
 
-`TASKMESH_PUBLIC_URL=https://taskmesh.YOUR-DOMAIN.example` is an unconfigured
-placeholder. A public domain, DNS, reachable HTTPS route and chosen publication
-method are still required. The private Tailscale host is not a public recruiter URL.
-No assumption is made about a public IP or port forwarding.
+The visitor console is publicly routed through Tailscale Funnel at
+`https://luxonis.tail6ad453.ts.net:8443/taskmesh/`. It requires no VPN or account.
+Only its loopback 8085 endpoint is routed; the owner API remains private on 8084.
 
 `deployments/Caddyfile.example` illustrates a host reverse proxy to loopback 8084.
 The API does not derive authorization or tenant identity from forwarded headers and
 does not trust arbitrary client IP headers. TLS terminates at the proxy. No SSE or
 WebSocket is used in Phase 1. Do not insert the administrative API key into a public
 website or frontend bundle. It gives access to every job in this single-project
-instance. Public anonymous trials require a later isolated-session API and limits.
+instance. The separate `taskmesh-public` stack provides isolated visitor sessions,
+admission limits and a separate PostgreSQL database with independent credentials.
 
 Environment: independent DB owner/runtime passwords and API token, no other service accounts
 or third-party keys. Use URL-safe hex for the database password in DATABASE_URL.

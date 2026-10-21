@@ -1,12 +1,10 @@
-.PHONY: test integration generate build check
+.PHONY: test integration build check
 test:
-	go test ./...
+	cargo test --locked --lib
 integration:
-	go test -count=1 -timeout=180s ./tests/integration
-generate:
-	go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.30.0 generate -f db/sqlc.yaml
+	cargo test --locked
 build:
-	go build -trimpath -o bin/taskmesh ./cmd/taskmesh
+	cargo build --release --locked
 check:
-	go vet ./...
-	go test -race ./...
+	cargo fmt --check
+	cargo clippy --locked --all-targets -- -D warnings

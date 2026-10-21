@@ -1,3 +1,7 @@
+> Historical Go deployment report. The backend has since migrated to Rust; see
+> [current migration and verification](rust-migration.md). Results below describe
+> the earlier implementation and are retained as historical evidence.
+
 # Verification report — 2026-10-21
 
 This is the **historical local baseline before deployment**. TaskMesh was

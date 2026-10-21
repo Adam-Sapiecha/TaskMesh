@@ -5,8 +5,7 @@ x-log: &log
   options: {max-size: "5m", max-file: "3"}
 x-environment: &environment
   DATABASE_URL: postgres://taskmesh_app:${TASKMESH_DB_PASSWORD:?Set runtime password}@postgres:5432/taskmesh?sslmode=disable
-  GOMEMLIMIT: 96MiB
-  GOMAXPROCS: "1"
+  RUST_LOG: info
 x-runtime: &runtime
   image: taskmesh:${TASKMESH_VERSION:?Set image version}
   build: .

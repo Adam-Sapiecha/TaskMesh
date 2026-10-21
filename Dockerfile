@@ -5,17 +5,21 @@ RUN npm ci --no-audit --no-fund
 COPY web/ ./
 RUN npm run build
 
-FROM --platform=$BUILDPLATFORM golang:1.26-alpine AS build
-ARG TARGETOS=linux
+FROM rust:1.99.1-bookworm AS build
+ARG CARGO_BUILD_JOBS=2
 ARG TARGETARCH
 WORKDIR /src
-COPY go.mod go.sum ./
-RUN go mod download
-COPY . .
-RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags='-s -w' -o /taskmesh ./cmd/taskmesh
+COPY Cargo.toml Cargo.lock ./
+COPY src/ ./src/
+COPY db/migrations/ ./db/migrations/
+RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
+    --mount=type=cache,id=taskmesh-target-${TARGETARCH},target=/src/target,sharing=locked \
+    cargo build --release --locked && cp target/release/taskmesh /taskmesh
 
-FROM alpine:3.23
-RUN apk add --no-cache ca-certificates && addgroup -S -g 10001 taskmesh && adduser -S -u 10001 -G taskmesh taskmesh
+FROM debian:bookworm-slim
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd --gid 10001 taskmesh && useradd --uid 10001 --gid taskmesh --no-create-home taskmesh
 COPY --from=build /taskmesh /usr/local/bin/taskmesh
 COPY --from=frontend /web/dist /app/web
 ENV WEB_DIR=/app/web

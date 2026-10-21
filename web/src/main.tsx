@@ -70,7 +70,7 @@ const types = [
     caption: "Words, characters & lines",
     icon: FileText,
     example:
-      "Distributed work. Durable results.\nTaskMesh runs background jobs on independent Go workers.",
+      "Distributed work. Durable results.\nTaskMesh runs background jobs on independent Rust workers.",
   },
   {
     id: "report.generate",
@@ -348,7 +348,7 @@ function App() {
           <div className="runtime-note">
             <span className="green-dot" />
             <span>Running on a Raspberry Pi</span>
-            <small>Go · PostgreSQL · Linux ARM64</small>
+            <small>Rust · PostgreSQL · Linux ARM64</small>
           </div>
           <a className="back-link" href={portfolio}>
             <ArrowDownLeft size={16} />
@@ -419,7 +419,7 @@ function App() {
                 title: "Workers online",
                 value: `${workers.filter((w) => w.online).length} / 3`,
                 icon: Cpu,
-                foot: "Independent Go processes",
+                foot: "Independent Rust processes",
               },
             ].map((s) => (
               <article className="stat" key={s.title}>
