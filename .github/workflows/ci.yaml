@@ -5,6 +5,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     services:
       postgres:
         image: postgres:17-alpine
@@ -35,7 +36,19 @@ jobs:
           cargo clippy --locked --all-targets -- -D warnings
       - name: Unit, PostgreSQL integration and process acceptance tests
         run: cargo test --locked
-      - uses: docker/setup-qemu-action@v3
+  images:
+    needs: verify
+    strategy:
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            platform: linux/amd64
+          - runner: ubuntu-24.04-arm
+            platform: linux/arm64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
       - uses: docker/setup-buildx-action@v3
-      - name: Build AMD64 and ARM64 images without publishing
-        run: docker buildx build --platform linux/amd64,linux/arm64 --tag taskmesh:ci .
+      - name: Build native image without publishing
+        run: docker buildx build --platform ${{ matrix.platform }} --tag taskmesh:ci .
