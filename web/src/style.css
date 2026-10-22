@@ -11,7 +11,7 @@
   font-weight: 400;
   --green: #c6ed92;
   --ink: #17251d;
-  --muted: #7b837d;
+  --muted: #58655c;
   --line: #e6e9e2;
   --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
@@ -125,7 +125,7 @@ h3 {
   background: #29352b;
   color: #cbe7ad;
   border: 1px solid #42503d;
-  font-size: 10px;
+  font-size: 12px;
   border-radius: 4px;
   min-width: 29px;
   height: 31px;
@@ -134,24 +134,24 @@ h3 {
 }
 .workspace strong {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 550;
   color: #e2e7df;
 }
 .workspace small {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   margin-top: 4px;
   color: #8b978b;
 }
 .tiny-tag {
   color: #aecb91;
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 0.7px;
   margin-left: auto;
 }
 .nav-label {
-  font: 9px var(--mono);
+  font: 12px var(--mono);
   color: #6d7e71;
   letter-spacing: 1.5px;
   margin: 34px 12px 13px;
@@ -185,7 +185,7 @@ h3 {
 .nav-shortcut,
 .nav-number {
   margin-left: auto;
-  font: 10px var(--mono);
+  font: 12px var(--mono);
   color: #73945e;
 }
 .nav-number {
@@ -203,14 +203,14 @@ h3 {
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
-  font-size: 10px;
+  font-size: 12px;
   border-bottom: 1px solid #2b352e;
   padding: 18px 9px;
   line-height: 1.6;
 }
 .runtime-note small {
   width: 100%;
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   color: #6f8274;
   padding-left: 13px;
   letter-spacing: 0.1px;
@@ -233,7 +233,7 @@ h3 {
   align-items: center;
   gap: 8px;
   margin: 22px 9px 0;
-  font-size: 11px;
+  font-size: 12px;
   color: #8c9c90;
 }
 .back-link:hover {
@@ -255,7 +255,7 @@ h3 {
   display: flex;
   align-items: center;
   gap: 13px;
-  font-size: 11px;
+  font-size: 12px;
   color: #9a9f98;
 }
 .breadcrumb strong {
@@ -271,11 +271,11 @@ h3 {
   display: flex;
   align-items: center;
   gap: 7px;
-  font-size: 10px;
+  font-size: 12px;
   color: #637360;
 }
 .avatar {
-  font-size: 10px;
+  font-size: 12px;
   display: grid;
   place-items: center;
   width: 30px;
@@ -301,7 +301,7 @@ main {
   display: flex;
   align-items: center;
   gap: 7px;
-  font: 9px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1.55px;
   color: #658455;
   margin-bottom: 14px;
@@ -327,7 +327,7 @@ h1 span {
   display: flex;
   align-items: center;
   gap: 8px;
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   color: #7e8977;
   border: 1px solid #e0e5da;
   border-radius: 5px;
@@ -361,7 +361,7 @@ h1 span {
   align-items: center;
   justify-content: space-between;
   color: #8e9986;
-  font-size: 11px;
+  font-size: 12px;
 }
 .stat > div svg {
   color: #a2ac98;
@@ -376,7 +376,7 @@ h1 span {
   font-variant-numeric: tabular-nums;
 }
 .stat > small {
-  font-size: 9px;
+  font-size: 12px;
   color: #929b8b;
 }
 .work-grid {
@@ -414,12 +414,12 @@ h1 span {
   letter-spacing: -0.2px;
 }
 .panel-heading p {
-  font-size: 10px;
+  font-size: 12px;
   color: #939b8c;
   margin-top: 5px;
 }
 .subtle-tag {
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   margin-left: auto;
   color: #9aa28d;
   letter-spacing: 0.8px;
@@ -431,13 +431,13 @@ h1 span {
   display: flex;
   align-items: center;
   gap: 8px;
-  font: 10px var(--mono);
+  font: 12px var(--mono);
   color: #9caa91;
   margin-bottom: 12px;
 }
 .field-label > span:first-child {
   font:
-    11px Inter,
+    12px Inter,
     -apple-system,
     BlinkMacSystemFont,
     "Segoe UI",
@@ -446,7 +446,7 @@ h1 span {
   letter-spacing: 0;
 }
 .field-label > .mono {
-  font-size: 8px;
+  font-size: 12px;
   letter-spacing: 0;
   margin-left: auto;
   color: #a0a793;
@@ -473,12 +473,12 @@ h1 span {
   color: #8d9c7f;
 }
 .task-type strong {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 550;
   margin-top: 8px;
 }
 .task-type small {
-  font-size: 8px;
+  font-size: 12px;
   color: #99a08e;
   margin-top: 4px;
   line-height: 1.4;
@@ -518,7 +518,7 @@ h1 span {
   padding: 9px 12px;
   background: #f5f7ef;
   border-bottom: 1px solid #e9eddf;
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   color: #849275;
 }
 .editor-head small {
@@ -540,7 +540,7 @@ textarea {
   border: 0;
   background: transparent;
   padding: 13px;
-  font: 10px/1.9 var(--mono);
+  font: 12px/1.9 var(--mono);
   color: #677455;
 }
 textarea:focus {
@@ -554,7 +554,7 @@ textarea:focus {
   padding: 0 12px 9px;
   display: flex;
   justify-content: space-between;
-  font-size: 8px;
+  font-size: 12px;
   color: #a0a993;
 }
 .options-row {
@@ -564,7 +564,7 @@ textarea:focus {
   margin: 17px 0 21px;
 }
 .options-row label {
-  font-size: 10px;
+  font-size: 12px;
   color: #7c896e;
   display: flex;
   flex-direction: column;
@@ -575,7 +575,7 @@ select {
   border: 1px solid #e1e6d7;
   border-radius: 5px;
   color: #657257;
-  font-size: 10px;
+  font-size: 12px;
   padding: 9px 10px;
 }
 .submit-row {
@@ -585,7 +585,7 @@ select {
   gap: 8px;
 }
 .submit-row > span {
-  font-size: 9px;
+  font-size: 12px;
   color: #9ba88d;
   display: flex;
   align-items: center;
@@ -600,7 +600,7 @@ select {
   color: #3a5422;
   border: 1px solid #badc8b;
   border-radius: 5px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   padding: 11px 13px;
   min-height: 38px;
@@ -640,14 +640,14 @@ select {
   margin-bottom: 24px;
 }
 .overline {
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 1.5px;
   color: #8c9f80;
 }
 .outline-pill {
   border: 1px solid #425638;
   padding: 5px 6px;
-  font: 7px var(--mono);
+  font: 12px var(--mono);
   color: #a6bf8b;
   border-radius: 4px;
   display: flex;
@@ -667,7 +667,7 @@ select {
   margin-bottom: 11px;
 }
 .flow-panel > p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.9;
   color: #8d9b81;
   margin-bottom: 31px;
@@ -689,7 +689,7 @@ select {
   flex-shrink: 0;
 }
 .flow-step strong {
-  font: 9px var(--mono);
+  font: 12px var(--mono);
   color: #607e4b;
   display: flex;
   gap: 8px;
@@ -701,13 +701,13 @@ select {
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: #d3ddc7;
 }
 .flow-step small {
   display: block;
-  font-size: 8px;
+  font-size: 12px;
   color: #82916f;
   line-height: 1.6;
   margin-top: 6px;
@@ -739,13 +739,13 @@ select {
   color: #718e55;
 }
 .flow-footer strong {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   color: #b1c49b;
 }
 .flow-footer small {
   display: block;
-  font-size: 8px;
+  font-size: 12px;
   margin-top: 6px;
   color: #738a61;
 }
@@ -768,7 +768,7 @@ select {
   align-items: center;
   gap: 8px;
   background: none;
-  font-size: 11px;
+  font-size: 12px;
   color: #969e8b;
   border-bottom: 2px solid transparent;
   padding: 17px 2px;
@@ -778,7 +778,7 @@ select {
   border-bottom-color: #8caa60;
 }
 .tabs button span {
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   background: #f0f3e9;
   color: #879c70;
   border-radius: 4px;
@@ -791,7 +791,7 @@ select {
 }
 .activity-tools select {
   padding: 7px;
-  font-size: 9px;
+  font-size: 12px;
 }
 .icon-button {
   display: grid;
@@ -814,7 +814,7 @@ table {
 thead {
   background: #fafbf7;
   color: #a0aa91;
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   letter-spacing: 0.5px;
 }
 th {
@@ -822,7 +822,7 @@ th {
   padding: 13px 22px;
 }
 td {
-  font-size: 9px;
+  font-size: 12px;
   padding: 13px 22px;
   border-top: 1px solid #edf0e7;
 }
@@ -839,11 +839,11 @@ tbody tr:hover {
 }
 .job-id {
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   color: #556b43;
 }
 .job-link small {
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   color: #9eaa91;
   display: block;
   margin-top: 5px;
@@ -856,7 +856,7 @@ tbody tr:hover {
   border: 1px solid #e7e9dd;
   background: #f5f6ef;
   border-radius: 4px;
-  font-size: 8px;
+  font-size: 12px;
   color: #919b7c;
   white-space: nowrap;
 }
@@ -885,7 +885,7 @@ tbody tr:hover {
   color: #999;
 }
 .queue-label {
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   border: 1px solid #e9ecdf;
   color: #899b72;
   padding: 3px 5px;
@@ -913,7 +913,7 @@ tbody tr:hover {
   color: #7e8c6a;
 }
 .empty p {
-  font-size: 10px;
+  font-size: 12px;
   color: #a1aa95;
   margin: 8px auto 14px;
   line-height: 1.7;
@@ -922,7 +922,7 @@ tbody tr:hover {
   display: inline-flex;
   gap: 6px;
   align-items: center;
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   color: #a9b39b;
 }
 .table-footer {
@@ -934,7 +934,7 @@ tbody tr:hover {
   border-top: 1px solid var(--line);
   padding: 12px 20px;
   color: #a4ae94;
-  font-size: 8px;
+  font-size: 12px;
   background: #fdfefb;
 }
 .table-footer > span:first-child {
@@ -969,7 +969,7 @@ tbody tr:hover {
 }
 .worker dl {
   margin-top: 19px;
-  font-size: 9px;
+  font-size: 12px;
 }
 .worker dl > div {
   display: flex;
@@ -1001,7 +1001,7 @@ tbody tr:hover {
   color: #6f805c;
 }
 .guarantees p {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.9;
   color: #929f82;
 }
@@ -1012,7 +1012,7 @@ tbody tr:hover {
   flex-wrap: wrap;
 }
 .guarantee-tags span {
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   border: 1px solid #e1e7d7;
   border-radius: 3px;
   padding: 4px 7px;
@@ -1026,7 +1026,7 @@ footer {
   padding: 20px 2px 22px;
   gap: 12px;
   color: #a0aa93;
-  font-size: 9px;
+  font-size: 12px;
 }
 footer > span {
   display: flex;
@@ -1048,7 +1048,7 @@ footer a {
 }
 footer p {
   width: 100%;
-  font-size: 8px;
+  font-size: 12px;
   color: #adb49e;
   line-height: 1.7;
 }
@@ -1063,7 +1063,7 @@ footer p {
   border-radius: 6px;
   padding: 13px 15px;
   margin-bottom: 18px;
-  font-size: 11px;
+  font-size: 12px;
   display: flex;
   gap: 9px;
   align-items: center;
@@ -1114,7 +1114,7 @@ footer p {
   margin-bottom: 15px;
 }
 .full-id {
-  font-size: 10px;
+  font-size: 12px;
   color: #9eaa91;
   overflow-wrap: anywhere;
   margin-top: 16px;
@@ -1130,23 +1130,23 @@ footer p {
 }
 .detail-meta small {
   display: block;
-  font-size: 9px;
+  font-size: 12px;
   color: #97a287;
 }
 .detail-meta strong {
-  font: 11px var(--mono);
+  font: 12px var(--mono);
   display: block;
   margin-top: 8px;
   color: #72865b;
 }
 .drawer h3 {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 550;
   margin: 23px 0 12px;
   color: #647953;
 }
 .drawer h3 span {
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 400;
   margin-left: 7px;
 }
@@ -1157,7 +1157,7 @@ footer p {
   background: #f1f5e9;
   border-radius: 6px;
   padding: 16px;
-  font: 10px/1.8 var(--mono);
+  font: 12px/1.8 var(--mono);
   color: #6c8354;
   max-height: 280px;
   overflow: auto;
@@ -1176,22 +1176,22 @@ footer p {
   gap: 13px;
   align-items: center;
   padding: 11px 0;
-  font-size: 10px;
+  font-size: 12px;
 }
 .timeline li strong {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   color: #72875d;
 }
 .timeline li small {
   display: block;
   color: #a5b297;
-  font: 8px var(--mono);
+  font: 12px var(--mono);
   margin-top: 5px;
 }
 .timeline li time {
   margin-left: auto;
-  font: 9px var(--mono);
+  font: 12px var(--mono);
   color: #98a58b;
 }
 .timeline-dot {
@@ -1205,7 +1205,7 @@ footer p {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 10px;
+  font-size: 12px;
 }
 .danger {
   color: #a6785f;
@@ -1225,7 +1225,7 @@ footer p {
     min-height: 100px;
   }
   .flow-step small {
-    font-size: 9px;
+    font-size: 12px;
   }
   .flow-panel > p {
     font-size: 12px;
@@ -1274,16 +1274,16 @@ footer p {
     padding: 17px;
   }
   .task-type small {
-    font-size: 7px;
+    font-size: 12px;
   }
   .task-type strong {
-    font-size: 9px;
+    font-size: 12px;
   }
   .submit-row > span {
-    font-size: 8px;
+    font-size: 12px;
   }
   .primary {
-    font-size: 10px;
+    font-size: 12px;
     padding: 10px;
   }
   .composer form {
@@ -1312,7 +1312,7 @@ footer p {
     gap: 10px;
   }
   .stat > div {
-    font-size: 10px;
+    font-size: 12px;
   }
   .stat strong {
     font-size: 27px;
@@ -1331,13 +1331,13 @@ footer p {
     padding: 9px 7px;
   }
   .workspace strong {
-    font-size: 10px;
+    font-size: 12px;
   }
   .tiny-tag {
-    font-size: 7px;
+    font-size: 12px;
   }
   .nav-item {
-    font-size: 11px;
+    font-size: 12px;
     padding: 12px 8px;
     gap: 8px;
   }
@@ -1345,7 +1345,7 @@ footer p {
     display: none;
   }
   .runtime-note {
-    font-size: 8px;
+    font-size: 12px;
   }
   .guarantees {
     grid-template-columns: 1fr;
@@ -1354,10 +1354,10 @@ footer p {
     grid-column: 1;
   }
   .task-type small {
-    font-size: 9px;
+    font-size: 12px;
   }
   .task-type strong {
-    font-size: 11px;
+    font-size: 12px;
   }
   .task-type {
     padding: 13px;
@@ -1394,7 +1394,7 @@ footer p {
   }
   .back-link {
     margin: 0;
-    font-size: 10px;
+    font-size: 12px;
   }
   .content {
     margin: 0;
@@ -1404,7 +1404,7 @@ footer p {
     padding: 0 20px;
   }
   .breadcrumb {
-    font-size: 9px;
+    font-size: 12px;
     gap: 9px;
   }
   .topbar-right {
@@ -1414,7 +1414,7 @@ footer p {
     display: none;
   }
   .connection {
-    font-size: 8px;
+    font-size: 12px;
   }
   main {
     padding: 28px 17px 0;
@@ -1423,7 +1423,7 @@ footer p {
     margin-bottom: 22px;
   }
   .eyebrow {
-    font-size: 8px;
+    font-size: 12px;
     letter-spacing: 1.3px;
   }
   h1 {
@@ -1435,7 +1435,7 @@ footer p {
     display: block;
   }
   .lead {
-    font-size: 11px;
+    font-size: 12px;
     margin-top: 11px;
     line-height: 1.8;
   }
@@ -1452,7 +1452,7 @@ footer p {
     font-size: 28px;
   }
   .stat > small {
-    font-size: 8px;
+    font-size: 12px;
   }
   .work-grid {
     margin-bottom: 19px;
@@ -1465,11 +1465,11 @@ footer p {
     font-size: 13px;
   }
   .panel-heading p {
-    font-size: 9px;
+    font-size: 12px;
     line-height: 1.5;
   }
   .subtle-tag {
-    font-size: 7px;
+    font-size: 12px;
   }
   .composer form {
     padding: 19px 16px;
@@ -1481,10 +1481,10 @@ footer p {
     padding: 10px 8px;
   }
   .task-type strong {
-    font-size: 9px;
+    font-size: 12px;
   }
   .task-type small {
-    font-size: 7px;
+    font-size: 12px;
     line-height: 1.6;
   }
   .type-check {
@@ -1498,10 +1498,10 @@ footer p {
     width: 16px;
   }
   .field-label > .mono {
-    font-size: 7px;
+    font-size: 12px;
   }
   .submit-row > span {
-    font-size: 8px;
+    font-size: 12px;
     max-width: 135px;
     line-height: 1.6;
   }
@@ -1509,7 +1509,7 @@ footer p {
     flex-shrink: 0;
   }
   .primary {
-    font-size: 10px;
+    font-size: 12px;
     gap: 6px;
   }
   .primary > svg:last-child {
@@ -1523,7 +1523,7 @@ footer p {
     gap: 16px;
   }
   .tabs button {
-    font-size: 10px;
+    font-size: 12px;
     gap: 6px;
   }
   .tabs svg {
@@ -1533,11 +1533,11 @@ footer p {
     gap: 6px;
   }
   .activity-tools select {
-    font-size: 8px;
+    font-size: 12px;
     max-width: 90px;
   }
   .table-footer {
-    font-size: 7px;
+    font-size: 12px;
     padding: 11px 13px;
     flex-wrap: wrap;
   }
@@ -1576,19 +1576,19 @@ footer p {
     gap: 12px;
   }
   .guarantees p {
-    font-size: 10px;
+    font-size: 12px;
   }
   .guarantee-tags {
     gap: 5px;
   }
   .guarantee-tags span {
-    font-size: 7px;
+    font-size: 12px;
   }
   footer {
-    font-size: 8px;
+    font-size: 12px;
   }
   footer p {
-    font-size: 7px;
+    font-size: 12px;
   }
   .drawer {
     padding: 23px 20px;
@@ -1605,3 +1605,49 @@ footer p {
     animation: none;
   }
 }
+
+/* Console: task input and execution history share the same reading column. */
+.app { display:block; }
+.content { margin-left:0; min-width:0; }
+.topbar { padding:18px max(24px,calc((100% - 1120px)/2)); height:auto; gap:24px; }
+.topbar .brand { color:var(--ink); font-size:24px; }
+.topbar .back-link { margin:0; color:#35543f; display:flex; align-items:center; gap:8px; }
+main { max-width:1168px; margin:0 auto; padding:28px 24px; }
+.heading-row { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:20px; gap:16px; }
+.heading-row h1 { font-size:30px; letter-spacing:-.8px; line-height:1.2; }
+.session-summary { font-size:13px; color:#4d5f51; }
+.work-grid { display:block; margin-bottom:24px; }
+.composer { width:100%; }
+.panel-heading { padding-bottom:16px; }
+.panel-heading h2 { font-size:19px; }
+.editor-head { display:none; }
+.input-frame textarea { min-height:110px; }
+.field-label { margin-top:16px; }
+.options-row { max-width:520px; }
+.activity-panel { scroll-margin-top:16px; }
+.skip { left:16px; }
+.muted { color:#58655c; }
+@media(max-width:600px) {
+  main { padding:22px 16px; }
+  .topbar { padding:16px; }
+  .heading-row { display:block; }
+  .session-summary { margin-top:8px; }
+  .task-types { grid-template-columns:1fr; }
+  .task-type { min-height:64px; }
+  .task-type small { font-size:12px; }
+  .submit-row { align-items:stretch; gap:12px; }
+  .submit-row .primary { width:100%; justify-content:center; }
+  .drawer { max-width:100%; width:100%; padding:22px 16px; }
+  .detail-meta { grid-template-columns:1fr 1fr; }
+  .drawer pre { overflow:auto; max-width:100%; }
+}
+
+/* Readable labels in the task form and execution table. */
+.task-type small,.editor-foot,.options-row label,.submit-row>span,.table-footer,
+.queue-label,.job-link small,.activity-tools,.panel-heading p,footer,footer p {color:#526046}
+textarea{font-size:14px;color:#425236}.task-type strong{font-size:14px}
+input,select{font-size:16px}.task-type small{font-size:12px}.editor-foot{font-size:12px}
+
+.field-label .mono,.tabs button,.tabs button span,thead,footer a{color:#526046}
+.status{color:#526046}.status.succeeded{color:#3c6428}.status.running{color:#345b73}
+.status.dead_letter,.status.cancelled{color:#81473a}.detail-meta small,.detail-meta strong{color:#526046}

@@ -1,16 +1,11 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { createRoot } from "react-dom/client";
 import {
-  Activity,
-  ArrowDownLeft,
   ArrowRight,
   Boxes,
   Check,
   CheckCircle2,
   ChevronRight,
-  Clock3,
-  Code2,
-  Cpu,
   FileText,
   Hash,
   Layers3,
@@ -19,7 +14,6 @@ import {
   RefreshCw,
   Server,
   ShieldCheck,
-  Terminal,
   X,
   XCircle,
 } from "lucide-react";
@@ -70,7 +64,7 @@ const types = [
     caption: "Words, characters & lines",
     icon: FileText,
     example:
-      "Distributed work. Durable results.\nTaskMesh runs background jobs on independent Rust workers.",
+      "One job, two lines.\nCount the words and characters in this text.",
   },
   {
     id: "report.generate",
@@ -84,7 +78,7 @@ const types = [
     name: "SHA-256 compute",
     caption: "Repeated cryptographic hashing",
     icon: Hash,
-    example: "A small input. A real computation.",
+    example: "taskmesh-sample",
   },
 ];
 const terminal = new Set(["SUCCEEDED", "DEAD_LETTER", "CANCELLED"]);
@@ -112,8 +106,9 @@ async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...options,
     credentials: "same-origin",
     headers: { "Content-Type": "application/json", ...options.headers },
+    signal: options.signal ?? AbortSignal.timeout(15000),
   });
-  const value = await response.json();
+  const value = await response.json().catch(() => ({ error: "The service returned an invalid response. Please retry." }));
   if (!response.ok)
     throw new Error(value.error || "Service unavailable. Please try again.");
   return value as T;
@@ -143,7 +138,9 @@ function App() {
     [tab, setTab] = useState("jobs");
   const booted = useRef(false),
     selectedID = useRef<string | null>(null),
-    working = useRef(false);
+    working = useRef(false),
+    drawerRef = useRef<HTMLElement>(null),
+    previousFocus = useRef<HTMLElement | null>(null);
   const refresh = async () => {
     if (working.current) return;
     working.current = true;
@@ -246,6 +243,7 @@ function App() {
     }
   };
   const inspect = async (job: Job) => {
+    previousFocus.current = document.activeElement as HTMLElement;
     selectedID.current = job.id;
     setDetail(job);
     setAttempts([]);
@@ -277,161 +275,49 @@ function App() {
     selectedID.current = null;
     setDetail(null);
   };
+  const detailOpen = detail !== null;
   useEffect(() => {
-    if (!detail) return;
-    const fn = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+    if (!detailOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    drawerRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") close();
+      if (event.key !== "Tab") return;
+      const controls = [...(drawerRef.current?.querySelectorAll<HTMLElement>(
+        'button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled), textarea:not(:disabled), [tabindex="0"]'
+      ) ?? [])];
+      const first = controls[0], last = controls[controls.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault(); last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault(); first?.focus();
+      }
     };
-    window.addEventListener("keydown", fn);
-    return () => window.removeEventListener("keydown", fn);
-  }, [detail]);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      requestAnimationFrame(() => previousFocus.current?.focus());
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [detailOpen]);
   return (
     <div className="app">
       <a className="skip" href="#main">
         Skip to console
       </a>
-      <aside className="sidebar">
-        <a className="brand" href="./">
-          <Mark />
-          <span>
-            taskmesh<span className="brand-dot">.</span>
-          </span>
-        </a>
-        <div className="workspace">
-          <span className="workspace-icon">AS</span>
-          <div>
-            <strong>Portfolio cluster</strong>
-            <small>Adam Sapiecha</small>
-          </div>
-          <span className="tiny-tag">LIVE</span>
-        </div>
-        <p className="nav-label">WORKSPACE</p>
-        <nav>
-          <button
-            className="nav-item selected"
-            onClick={() => {
-              setTab("jobs");
-              document.querySelector("#main")?.scrollIntoView();
-            }}
-          >
-            <Activity size={18} />
-            Execution console<span className="nav-shortcut">01</span>
-          </button>
-          <button
-            className="nav-item"
-            onClick={() => {
-              setTab("workers");
-              document
-                .querySelector("#activity")
-                ?.scrollIntoView({ behavior: "smooth" });
-            }}
-          >
-            <Server size={18} />
-            Worker fleet
-            <span className="nav-number">
-              {workers.filter((w) => w.online).length}
-            </span>
-          </button>
-          <button
-            className="nav-item"
-            onClick={() =>
-              document
-                .querySelector("#guarantees")
-                ?.scrollIntoView({ behavior: "smooth" })
-            }
-          >
-            <ShieldCheck size={18} />
-            How it works
-          </button>
-        </nav>
-        <div className="sidebar-bottom">
-          <div className="runtime-note">
-            <span className="green-dot" />
-            <span>Running on a Raspberry Pi</span>
-            <small>Rust · PostgreSQL · Linux ARM64</small>
-          </div>
-          <a className="back-link" href={portfolio}>
-            <ArrowDownLeft size={16} />
-            Back to portfolio
-          </a>
-        </div>
-      </aside>
-      <div className="content">
+      <div className="content" inert={detailOpen}>
         <header className="topbar">
-          <div className="breadcrumb">
-            <span>Workspace</span>
-            <ChevronRight size={13} />
-            <strong>Execution console</strong>
-          </div>
-          <div className="topbar-right">
-            <span className="connection">
-              <span className={ready ? "green-dot" : "amber-dot"} />
-              {ready ? "System operational" : "Connecting"}
-            </span>
-            <span className="avatar">AS</span>
-          </div>
+          <a className="brand" href="./"><Mark /><span>taskmesh<span className="brand-dot">.</span></span></a>
+          <a className="back-link" href={portfolio}>Portfolio <ArrowRight size={16} /></a>
         </header>
         <main id="main">
           <div className="heading-row">
-            <div>
-              <div className="eyebrow">
-                <span className="green-dot" />
-                DISTRIBUTED TASK EXECUTION
-              </div>
-              <h1>
-                Small tasks. <span>Built to go further.</span>
-              </h1>
-              <p className="lead">
-                Submit a job. Follow its journey. Inspect the result.
-                <br />
-                Real workers, a durable queue, and your own space to explore.
-              </p>
-            </div>
-            <div className="environment">
-              <Terminal size={15} />
-              <span>portfolio / production</span>
-              <span className="environment-dot" />
-            </div>
+            <h1>Jobs</h1>
+            <p className="session-summary" role="status">
+              {ready ? `${active + queued} active · ${completed} completed · ${workers.filter(w => w.online).length} workers online` : "Connecting to the service…"}
+            </p>
           </div>
-          <section className="stats" aria-label="Your session statistics">
-            {[
-              {
-                title: "Jobs submitted",
-                value: jobs.length,
-                icon: Boxes,
-                foot: "In your current session",
-              },
-              {
-                title: "In progress",
-                value: active,
-                icon: Activity,
-                foot: `${queued} waiting in the queue`,
-              },
-              {
-                title: "Completed",
-                value: completed,
-                icon: CheckCircle2,
-                foot: jobs.length
-                  ? `${Math.round((completed / jobs.length) * 100)}% completion rate`
-                  : "Ready when you are",
-              },
-              {
-                title: "Workers online",
-                value: `${workers.filter((w) => w.online).length} / 3`,
-                icon: Cpu,
-                foot: "Independent Rust processes",
-              },
-            ].map((s) => (
-              <article className="stat" key={s.title}>
-                <div>
-                  <span>{s.title}</span>
-                  <s.icon size={17} />
-                </div>
-                <strong>{s.value}</strong>
-                <small>{s.foot}</small>
-              </article>
-            ))}
-          </section>
           {error && (
             <div className="error" role="alert">
               <XCircle size={17} />
@@ -443,19 +329,10 @@ function App() {
           )}
           <div className="work-grid">
             <section className="panel composer">
-              <div className="panel-heading">
-                <div className="section-icon">
-                  <Play size={16} />
-                </div>
-                <div>
-                  <h2>Run something real</h2>
-                  <p>Your input. Our queue. A result you can inspect.</p>
-                </div>
-                <span className="subtle-tag">NEW JOB</span>
-              </div>
+              <div className="panel-heading"><h2>New job</h2></div>
               <form onSubmit={submit}>
                 <div className="field-label">
-                  01 <span>Choose a task</span>
+                  <span>Task</span>
                 </div>
                 <div className="task-types">
                   {types.map((t) => (
@@ -478,7 +355,6 @@ function App() {
                   ))}
                 </div>
                 <label className="field-label" htmlFor="payload">
-                  02{" "}
                   <span>
                     {selected.id === "report.generate"
                       ? "Enter your numbers"
@@ -568,70 +444,20 @@ function App() {
                 </div>
               </form>
             </section>
-            <aside className="flow-panel">
-              <div className="flow-top">
-                <span className="overline">UNDER THE HOOD</span>
-                <span className="outline-pill">
-                  <span className="green-dot" />
-                  At least once
-                </span>
-              </div>
-              <h2>Durable by design.</h2>
-              <p>
-                A task is saved before it is acknowledged. Execution happens
-                outside the request.
-              </p>
-              <div className="flow-step">
-                <span className="flow-node">
-                  <Code2 size={18} />
-                </span>
-                <div>
-                  <strong>
-                    01 <span>Submit</span>
-                  </strong>
-                  <small>Validated input, persisted in PostgreSQL</small>
-                </div>
-                <Check size={14} />
-              </div>
-              <div className="flow-line" />
-              <div className="flow-step">
-                <span className="flow-node">
-                  <Layers3 size={18} />
-                </span>
-                <div>
-                  <strong>
-                    02 <span>Claim & execute</span>
-                  </strong>
-                  <small>Atomic claim, bounded worker concurrency</small>
-                </div>
-                <span className="green-dot" />
-              </div>
-              <div className="flow-line" />
-              <div className="flow-step">
-                <span className="flow-node">
-                  <CheckCircle2 size={18} />
-                </span>
-                <div>
-                  <strong>
-                    03 <span>Commit result</span>
-                  </strong>
-                  <small>Only the current lease can acknowledge</small>
-                </div>
-              </div>
-              <div className="flow-footer">
-                <span className="bracket">{"{ }"}</span>
-                <div>
-                  <strong>No black boxes.</strong>
-                  <small>Every attempt leaves a durable trail.</small>
-                </div>
-              </div>
-            </aside>
           </div>
           <section className="panel activity-panel" id="activity">
             <div className="activity-head">
-              <div className="tabs" role="tablist" aria-label="Console view">
+              <div className="tabs" role="tablist" aria-label="Console view" onKeyDown={event => {
+                if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+                event.preventDefault();
+                const next = event.key === "Home" ? "jobs" : event.key === "End" ? "workers" : tab === "jobs" ? "workers" : "jobs";
+                setTab(next);
+                event.currentTarget.querySelector<HTMLButtonElement>(`[data-tab="${next}"]`)?.focus();
+              }}>
                 <button
                   role="tab"
+                  data-tab="jobs"
+                  tabIndex={tab === "jobs" ? 0 : -1}
                   aria-selected={tab === "jobs"}
                   className={tab === "jobs" ? "active" : ""}
                   onClick={() => setTab("jobs")}
@@ -641,6 +467,8 @@ function App() {
                 </button>
                 <button
                   role="tab"
+                  data-tab="workers"
+                  tabIndex={tab === "workers" ? 0 : -1}
                   aria-selected={tab === "workers"}
                   className={tab === "workers" ? "active" : ""}
                   onClick={() => setTab("workers")}
@@ -791,23 +619,6 @@ function App() {
               </span>
             </div>
           </section>
-          <section className="guarantees" id="guarantees">
-            <div>
-              <ShieldCheck size={19} />
-              <h3>Built for the unexpected.</h3>
-            </div>
-            <p>
-              Lease renewal, fencing tokens and retries protect the job state
-              when a worker disappears. Delivery is at least once; exactly-once
-              external side effects are not promised.
-            </p>
-            <div className="guarantee-tags">
-              <span>Atomic claims</span>
-              <span>Lease fencing</span>
-              <span>Exponential backoff</span>
-              <span>Crash recovery</span>
-            </div>
-          </section>
           <footer>
             <span>
               <Mark />
@@ -829,6 +640,7 @@ function App() {
         <div className="drawer-backdrop" onClick={close}>
           <section
             className="drawer"
+            ref={drawerRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="job-detail-title"
