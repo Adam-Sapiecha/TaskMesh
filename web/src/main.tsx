@@ -547,12 +547,12 @@ function App() {
                     <h3>
                       {jobs.length
                         ? "No jobs match this filter"
-                        : "No jobs in this session"}
+                        : "No jobs yet"}
                     </h3>
                     <p>
                       {jobs.length
                         ? "Choose another status to see your jobs."
-                        : "Submit a job to see its status, result and execution history here."}
+                        : "Submit a job to see its result and attempts."}
                     </p>
                   </div>
                 )}
@@ -593,7 +593,7 @@ function App() {
             <div className="table-footer">
               <span>
                 <span className="green-dot" />
-                Your session only · Updates every 2.5s
+                Your session
               </span>
               <span>
                 {session
@@ -607,9 +607,7 @@ function App() {
               About this project <ArrowRight size={13} />
             </a>
             <p>
-              Your jobs are private to this browser session and expire after 24
-              hours. This public workspace is separate from the owner's data. Do
-              not submit sensitive information.
+              Use test data. Jobs are isolated from the owner’s workspace.
             </p>
           </footer>
         </main>
