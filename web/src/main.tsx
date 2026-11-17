@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { createRoot } from "react-dom/client";
 import {
   ArrowRight,
-  Boxes,
   Check,
   ChevronRight,
   FileText,
@@ -111,13 +110,6 @@ async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
   if (!response.ok)
     throw new Error(value.error || "Service unavailable. Please try again.");
   return value as T;
-}
-function Mark() {
-  return (
-    <span className="mark" aria-hidden="true">
-      <Boxes size={24} strokeWidth={1.6} />
-    </span>
-  );
 }
 function App() {
   const [session, setSession] = useState<Session | null>(null),
@@ -307,7 +299,6 @@ function App() {
       </a>
       <div className="content" inert={detailOpen}>
         <header className="topbar">
-          <a className="brand" href="./"><Mark /><span>taskmesh<span className="brand-dot">.</span></span></a>
           <a className="back-link" href={portfolio}>Portfolio <ArrowRight size={16} /></a>
         </header>
         <main id="main">
@@ -612,11 +603,6 @@ function App() {
             </div>
           </section>
           <footer>
-            <span>
-              <Mark />
-              TaskMesh <span className="footer-sep">/</span> Built by Adam
-              Sapiecha
-            </span>
             <a href={portfolio + "projects.html#taskmesh"}>
               About this project <ArrowRight size={13} />
             </a>
