@@ -4,7 +4,6 @@ import {
   ArrowRight,
   Boxes,
   Check,
-  CheckCircle2,
   ChevronRight,
   FileText,
   Hash,
@@ -554,23 +553,16 @@ function App() {
                 </table>
                 {shown.length === 0 && (
                   <div className="empty">
-                    <div className="empty-icon">
-                      <Boxes size={27} strokeWidth={1.3} />
-                    </div>
                     <h3>
                       {jobs.length
                         ? "No jobs match this filter"
-                        : "Your next task starts here"}
+                        : "No jobs in this session"}
                     </h3>
                     <p>
                       {jobs.length
                         ? "Choose another status to see your jobs."
-                        : "Submit your first job above and watch it move through the queue."}
+                        : "Submit a job to see its status, result and execution history here."}
                     </p>
-                    <span>
-                      <ArrowRight size={13} /> Real execution · Results saved to
-                      PostgreSQL
-                    </span>
                   </div>
                 )}
               </div>
@@ -647,7 +639,6 @@ function App() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="drawer-top">
-              <span className="overline">EXECUTION DETAILS</span>
               <button
                 className="icon-button"
                 onClick={close}
